@@ -22,4 +22,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Script futtatása
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python stock_monitor.py
+
