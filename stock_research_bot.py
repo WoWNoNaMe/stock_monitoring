@@ -2,8 +2,8 @@ import os
 import requests
 from datetime import datetime
 
-TELEGRAM_TOKEN = "8698021994:AAH42XQB9BvjrzFBHooQ2fDB1CYmczPuzpg"
-GROQ_API_KEY = "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"
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 TELEGRAM_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
