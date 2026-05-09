@@ -6,8 +6,9 @@ import os
 from datetime import datetime
 
 # --- BEÁLLÍTÁSOK ---
-TELEGRAM_TOKEN = "8630467484:AAF6ebjSy11tEUYU9frEXE3A20aorlwLZME"
-CHAT_ID = "8721221476"
+import os
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
+CHAT_ID = os.environ.get("CHAT_ID", "")
 
 WATCHLIST = [
     # --- MEGA CAP AI / TECH ---
@@ -37,8 +38,8 @@ WATCHLIST = [
 ]
 
 ATR_PERIOD = 14
-ATR_MULTIPLIER_DAILY = 1.75
-ATR_MULTIPLIER_FROM_HIGH = 3.7
+ATR_MULTIPLIER_DAILY = 2.0
+ATR_MULTIPLIER_FROM_HIGH = 5.0
 
 ALERTED_FILE = "alerted_today.json"
 
@@ -185,3 +186,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
