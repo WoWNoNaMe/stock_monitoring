@@ -1,23 +1,20 @@
 name: Stock Monitor
-
+ 
 on:
-  schedule:
-    - cron: '*/10 * * * *'
   workflow_dispatch:
-
+ 
 jobs:
   monitor:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
+ 
       - name: Python beállítása
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
+ 
       - name: Cache betöltése (napi riasztások)
         uses: actions/cache@v4
         with:
@@ -25,21 +22,20 @@ jobs:
           key: alerted-${{ github.run_id }}
           restore-keys: |
             alerted-
-
+ 
       - name: Függőségek telepítése
         run: pip install -r requirements.txt
-
+ 
       - name: Script futtatása
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python stock_monitor.py
-
+ 
       - name: Cache mentése (napi riasztások)
         uses: actions/cache/save@v4
         if: always()
         with:
           path: alerted_today.json
           key: alerted-${{ github.run_id }}
-
 
