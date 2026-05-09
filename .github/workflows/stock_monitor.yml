@@ -2,8 +2,8 @@ name: Stock Monitor
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # 10 percenként
-  workflow_dispatch:          # Kézzel is indítható
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
 
 jobs:
   monitor:
@@ -18,6 +18,14 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Cache betöltése (napi riasztások)
+        uses: actions/cache@v4
+        with:
+          path: alerted_today.json
+          key: alerted-${{ github.run_id }}
+          restore-keys: |
+            alerted-
+
       - name: Függőségek telepítése
         run: pip install -r requirements.txt
 
@@ -26,4 +34,12 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python stock_monitor.py
+
+      - name: Cache mentése (napi riasztások)
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: alerted_today.json
+          key: alerted-${{ github.run_id }}
+
 
