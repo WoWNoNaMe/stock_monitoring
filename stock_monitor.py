@@ -61,21 +61,41 @@ def send_telegram(message):
     requests.post(url, json=payload)
 
 def calculate_atr(data, period=14):
-    high = data["High"].squeeze()
-    low = data["Low"].squeeze()
-    close = data["Close"].squeeze()
+    high = data["High"].squeeze() if hasattr(data["High"], 'squeeze') else data["High"]
+    low = data["Low"].squeeze() if hasattr(data["Low"], 'squeeze') else data["Low"]
+    close = data["Close"].squeeze() if hasattr(data["Close"], 'squeeze') else data["Close"]
+    if hasattr(high, 'columns'):
+        high = high.iloc[:, 0]
+        low = low.iloc[:, 0]
+        close = close.iloc[:, 0]
     tr1 = high - low
     tr2 = (high - close.shift()).abs()
     tr3 = (low - close.shift()).abs()
     tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
-    return tr.rolling(window=period).mean().iloc[-1]
+    return float(tr.rolling(window=period).mean().iloc[-1])
 
 def calculate_rsi(data, period=14):
-    delta = data["Close"].diff()
+    close = data["Close"].squeeze() if hasattr(data["Close"], 'squeeze') else data["Close"]
+    if hasattr(close, 'columns'):
+        close = close.iloc[:, 0]
+    delta = close.diff()
     gain = delta.where(delta > 0, 0).rolling(period).mean()
     loss = -delta.where(delta < 0, 0).rolling(period).mean()
     rs = gain / loss
-    return (100 - (100 / (1 + rs))).iloc[-1]
+    return float((100 - (100 / (1 + rs))).iloc[-1])
+
+def to_float(val):
+    if hasattr(val, 'iloc'):
+        val = val.iloc[-1] if len(val.shape) > 1 else val
+    if hasattr(val, 'item'):
+        return float(val.item())
+    return float(val)
+
+def get_series(data, col):
+    s = data[col]
+    if isinstance(s.columns if hasattr(s, 'columns') else None, pd.Index):
+        s = s.iloc[:, 0]
+    return s.squeeze()
 
 def check_stock(symbol, data, alerted_today):
     try:
@@ -83,10 +103,15 @@ def check_stock(symbol, data, alerted_today):
             print(f"{symbol}: nincs elég adat")
             return
 
+        close = get_series(data, "Close")
+        high = get_series(data, "High")
+        low = get_series(data, "Low")
+        volume = get_series(data, "Volume")
+
         atr = float(calculate_atr(data, ATR_PERIOD))
-        current_price = float(data["Close"].squeeze().iloc[-1])
-        prev_close = float(data["Close"].squeeze().iloc[-2])
-        local_high = float(data["High"].squeeze().iloc[-30:].max())
+        current_price = float(close.iloc[-1])
+        prev_close = float(close.iloc[-2])
+        local_high = float(high.iloc[-30:].max())
 
         import math
         if any(math.isnan(x) for x in [atr, current_price, prev_close, local_high]):
@@ -100,8 +125,8 @@ def check_stock(symbol, data, alerted_today):
         threshold_from_high = -atr_pct * ATR_MULTIPLIER_FROM_HIGH
 
         rsi = float(calculate_rsi(data))
-        avg_volume = float(data["Volume"].squeeze().iloc[-15:-1].mean())
-        volume_change = (float(data["Volume"].squeeze().iloc[-1]) / avg_volume - 1) * 100
+        avg_volume = float(volume.iloc[-15:-1].mean())
+        volume_change = (float(volume.iloc[-1]) / avg_volume - 1) * 100
 
         from_high_alert = drop_from_high_pct <= threshold_from_high
         daily_alert = daily_change_pct <= threshold_daily
@@ -186,4 +211,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
