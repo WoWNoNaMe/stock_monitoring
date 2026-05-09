@@ -1,0 +1,25 @@
+name: Stock Monitor
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # 10 percenként
+  workflow_dispatch:          # Kézzel is indítható
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Python beállítása
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Függőségek telepítése
+        run: pip install -r requirements.txt
+
+      - name: Script futtatása
+        run: python stock_monitor.py
