@@ -31,15 +31,15 @@ WATCHLIST = [
     "CEG", "VST", "NNE", "SMR", "OKLO", "CCJ", "URG",
 
     # --- FINTECH / KRIPTO KAPCSOLT ---
-    "COIN", "PYPL", "SOFI", "HOOD", "MARA", "RIOT", "BTC-USD", "ETH-USD",
+    "COIN", "PYPL", "SQ", "HOOD", "MARA", "RIOT", "BTC-USD", "ETH-USD",
 
     # --- EURÓPAI ---
     "RHM.DE", "AIR.PA", "SAP.DE",
 ]
 
 ATR_PERIOD = 14
-ATR_MULTIPLIER_DAILY = 1.75
-ATR_MULTIPLIER_FROM_HIGH = 3.7
+ATR_MULTIPLIER_DAILY = 2.0
+ATR_MULTIPLIER_FROM_HIGH = 5.0
 
 ALERTED_FILE = "alerted_today.json"
 
@@ -58,7 +58,9 @@ def save_alerted(symbols):
 def send_telegram(message):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {"chat_id": CHAT_ID, "text": message, "parse_mode": "HTML"}
-    requests.post(url, json=payload)
+    print(f"Telegram küldés: token={TELEGRAM_TOKEN[:10]}... chat_id={CHAT_ID}")
+    response = requests.post(url, json=payload)
+    print(f"Telegram válasz: {response.status_code} {response.text}")
 
 def calculate_atr(data, period=14):
     high = data["High"].squeeze() if hasattr(data["High"], 'squeeze') else data["High"]
