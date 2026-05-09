@@ -31,7 +31,7 @@ WATCHLIST = [
     "CEG", "VST", "NNE", "SMR", "OKLO", "CCJ", "URG",
 
     # --- FINTECH / KRIPTO KAPCSOLT ---
-    "COIN", "PYPL", "SQ", "HOOD", "MARA", "RIOT", "BTC-USD", "ETH-USD",
+    "COIN", "PYPL", "SOFI", "HOOD", "MARA", "RIOT", "BTC-USD", "ETH-USD",
 
     # --- EURÓPAI ---
     "RHM.DE", "AIR.PA", "SAP.DE",
